@@ -1,7 +1,7 @@
 # Final Project Proposal
 
 ## Repository
-<Link to your project's public GitHub respository>
+https://github.com/tejasvig123/final-project.git
 
 ## Description
 My final project is Glitch Art, and I want it to take an image and intentionally break it into random pixels. This would be useful to make unique drawings or artwork because each iteration would be different, and some artists might want that.1-2 sentence description of what it will do and how it relevant to media and digital arts.
