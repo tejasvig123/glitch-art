@@ -1,4 +1,4 @@
-# Final Project Proposal
+# Glitch Art
 
 ## Repository
 https://github.com/tejasvig123/final-project.git
