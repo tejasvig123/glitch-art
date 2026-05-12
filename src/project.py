@@ -87,7 +87,7 @@ class GlitchSynthesizer:
         mode = pil_image.mode
         size = pil_image.size
         data = pil_image.tobytes()
-        return pygame.image.fromstring(data, size, mode)
+        return pygame.image.frombuffer(data, size, mode)
 
     def run(self):
         rgb_offset = 0
