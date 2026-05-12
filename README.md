@@ -1,7 +1,7 @@
 # Glitch Art
 
 ## Demo
-Demo Video: <URL>
+Demo Video: <https://vimeo.com/1191395943?share=copy&fl=sv&fe=ci>
 
 ## GitHub Repository
 GitHub Repo: <https://github.com/tejasvig123/glitch-art.git>
