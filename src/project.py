@@ -63,4 +63,104 @@ class GlitchSynthesizer:
             
         return glitched
 
-    
+    def apply_pixel_sort(self, image, num_strips=15):
+        glitched = image.copy()
+        for _ in range(num_strips):
+            y = random.randint(0, self.height - 1)
+            x_start = random.randint(0, self.width // 2)
+            length = random.randint(50, self.width // 2)
+            x_end = min(x_start + length, self.width)
+            
+            box = (x_start, y, x_end, y + 1)
+            strip = glitched.crop(box)
+            pixels = list(strip.getdata())
+            
+            # Sort by brightness
+            pixels.sort(key=lambda p: 0.299*p[0] + 0.587*p[1] + 0.114*p[2])
+            
+            strip.putdata(pixels)
+            glitched.paste(strip, box)
+            
+        return glitched
+
+    def pil_to_pygame(self, pil_image):
+        mode = pil_image.mode
+        size = pil_image.size
+        data = pil_image.tobytes()
+        return pygame.image.fromstring(data, size, mode)
+
+    def run(self):
+        rgb_offset = 0
+        mosh_intensity = 0
+        needs_update = True
+        
+        base_image = self.master_image.copy() 
+        current_image = base_image.copy()
+
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT:
+                        rgb_offset += 5
+                        needs_update = True
+                    elif event.key == pygame.K_LEFT:
+                        rgb_offset -= 5
+                        needs_update = True
+                    elif event.key == pygame.K_UP:
+                        mosh_intensity += 5
+                        needs_update = True
+                    elif event.key == pygame.K_DOWN:
+                        mosh_intensity = max(0, mosh_intensity - 5)
+                        needs_update = True
+                    elif event.key == pygame.K_SPACE:
+                        base_image = self.apply_pixel_sort(base_image, num_strips=25)
+                        needs_update = True
+                    elif event.key == pygame.K_r:
+                        rgb_offset = 0
+                        mosh_intensity = 0
+                        base_image = self.master_image.copy()
+                        needs_update = True
+                    elif event.key == pygame.K_s:
+                        save_name = f"glitch_export_{random.randint(1000,9999)}.png"
+                        # Save to root folder
+                        root_dir = os.path.dirname(os.path.dirname(__file__))
+                        save_path = os.path.join(root_dir, save_name)
+                        current_image.save(save_path)
+                        print(f"SUCCESS: Saved as '{save_name}' in the root folder!")
+
+            if needs_update:
+                current_image = self.apply_rgb_shift(base_image, rgb_offset)
+                current_image = self.apply_datamosh(current_image, mosh_intensity)
+                
+                pg_surface = self.pil_to_pygame(current_image)
+                self.screen.blit(pg_surface, (0, 0))
+                
+                ui_text = f"RGB:{rgb_offset} | MOSH:{mosh_intensity} | SORT(SPACE) | [R]ESET | [S]AVE"
+                text_shadow = self.font.render(ui_text, True, (0, 0, 0))
+                text_surface = self.font.render(ui_text, True, (0, 255, 150))
+                
+                overlay = pygame.Surface((self.width, 40))
+                overlay.set_alpha(150)
+                overlay.fill((0, 0, 0))
+                self.screen.blit(overlay, (0, 0))
+                
+                self.screen.blit(text_shadow, (12, 10))
+                self.screen.blit(text_surface, (10, 8))
+                
+                pygame.display.flip()
+                needs_update = False
+
+        pygame.quit()
+
+
+def main():
+    app = GlitchSynthesizer("test.jpg")
+    app.run()
+
+
+if __name__ == "__main__":
+    main()
